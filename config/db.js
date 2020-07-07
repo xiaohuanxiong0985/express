@@ -1,29 +1,33 @@
 const mysql = require('mysql');
-const db = {
-  sql (sql, callback) {
-    if (!sql) {
-      callback();
-      return false;
-    }
-    mysql.createPool(this.config())
-      .query(sql, (err, rows, fields) => {
+//  开启连接池
+const config = {
+  host: 'localhost',
+  user: 'root',
+  password: 'play933364',
+  port: '3306',
+  database: 'xiaochengxu',
+  connectionLimit: 10
+}
+let pool = mysql.createPool(config);
+let query = function(sql, params, callback) {
+  try {
+    pool.getConnection((err, connection) => {
+      if (err) {
+        return callback(true);
+      }
+      connection.query(sql, params, (err, result) => {
+        connection.release();
         if (err) {
-          console.log(err);
-          callback(err, null);
-          return;
+          console.error('db error')
+          return callback(true)
         }
-        callback(null, rows, fields);
+        callback(false, result);
       })
-  },
-  config () {
-    return {
-      host: 'localhost',
-      user: 'root',
-      password: 'play933364',
-      port: '3306',
-      database: 'xiaochengxu',
-      connectionLimit: 10
-    }
+    })
+  } catch (e) {
+    return callback(true)
   }
 }
-module.exports = db;
+
+
+module.exports.query = query;

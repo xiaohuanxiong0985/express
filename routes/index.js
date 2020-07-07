@@ -7,6 +7,12 @@ const WXBizDataCrypt = require('./WXBizDataCrypt')
 const jwt = require('jsonwebtoken');  //  生成token
 const db = require('../util/db'); //  数据库方法
 /* GET home page. */
+router.get('/userInfo', (req, res, next) => {
+  res.send({
+    code: 200,
+    data: '123'
+  });
+})
 router.get('/userList', function(req, res, next) {
   db.query('user')
     .then(data => {
